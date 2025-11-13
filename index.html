@@ -34,6 +34,13 @@
             top: 0;
             z-index: 1000;
         }
+		
+.header-top-row {
+    display: flex;
+    justify-content: space-between; /* 將 Logo 和 Selector 推到兩側 */
+    align-items: center;
+    padding: 15px 0; /* 給予上下內邊距 */
+}
         .logo {
             font-size: 1.5em;
             font-weight: bold;
@@ -472,11 +479,11 @@
 /* 自訂選單樣式，確保文字不會太過擁擠 */
 #custom-language-selector {
     position: static;
-    margin-right: 25px;
+    margin: 0;
     background: none; 
     padding: 0;
     border-radius: 0;
-    box-shadow: 0;
+    box-shadow: none;
 }
 
 /* 調整下拉選單樣式 */
@@ -1020,6 +1027,7 @@ html.translated-rm-topbar body {
 
 </body>
 </html>
+
 
 
 
