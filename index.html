@@ -924,10 +924,13 @@ html.translated-rm-topbar body {
 
         // 初始化：載入留言並綁定事件
         document.addEventListener('DOMContentLoaded', () => {
-            if (window.localStorage) {
-                renderComments();
-                formElement.addEventListener('submit', handleFormSubmit);
-
+			
+		// 確保 commentListElement 在這裡被定義 (它已經是全域變數，但再次確認)
+    const commentListElement = document.getElementById('commentList'); 
+			if (window.localStorage && commentListElement) {
+        renderComments();
+        formElement.addEventListener('submit', handleFormSubmit);
+			
 			commentListElement.addEventListener('click', (event) => {
             const target = event.target;
             
@@ -1017,6 +1020,7 @@ html.translated-rm-topbar body {
 
 </body>
 </html>
+
 
 
 
