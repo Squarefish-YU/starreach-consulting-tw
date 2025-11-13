@@ -487,6 +487,34 @@
     border-radius: 3px;
     cursor: pointer;
 }
+		
+/* --- 13. 隱藏 Google 翻譯頂部橫幅及相關元素 --- */
+/* 1. 隱藏主要提示橫幅的 iFrame 或頂層容器 */
+/* 這是隱藏 "這頁面已翻譯..." 提示的關鍵 */
+.goog-te-banner-frame { 
+    visibility: hidden !important; 
+    height: 0 !important; 
+    display: none !important;
+}
+
+/* 2. 修正 Google 翻譯可能對 body 元素造成的位移 */
+/* 有時 Google 會為橫幅預留空間，導致網頁內容下移 */
+body {
+    top: 0px !important; 
+    margin-top: 0px !important;
+}
+
+/* 3. 隱藏可能在右下角出現的翻譯浮動按鈕 */
+/* 如果您沒有看到這個按鈕，可以省略這段 */
+.goog-logo-link {
+    display: none !important;
+}
+.goog-tooltip {
+    display: none !important;
+}
+.goog-tooltip:hover {
+    display: none !important;
+}
 
         /* --- RWD 樣式結束 --- */
 
@@ -978,6 +1006,7 @@
 
 </body>
 </html>
+
 
 
 
