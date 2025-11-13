@@ -663,13 +663,15 @@
         // 初始範例留言 (已包含 ID)
         const initialComments = [
             {
-                id: generateId(), 
+                // 新增一個前綴 'initial-' 來標記為預設留言
+                id: 'initial-' + generateId(), 
                 name: "王先生",
                 date: "2025-11-01",
                 content: "貴公司的策略顧問沈柏霖先生提供的市場分析非常精闢，讓我們在面對新興市場時更有信心，流程優化建議也立竿見影！"
             },
             {
-                id: generateId(), 
+                // 新增一個前綴 'initial-' 來標記為預設留言
+                id: 'initial-' + generateId(), 
                 name: "李小姐 (XX 科技)",
                 date: "2025-11-08",
                 content: "感謝倪佟識顧問協助我們重新梳理了內部的管理流程，效率大幅提升。專業且效率極高。"
@@ -685,11 +687,18 @@
             commentItem.className = 'comment-item';
             commentItem.dataset.commentId = comment.id; 
             
+            // 【修改點】判斷是否為預設留言
+            const isInitial = comment.id.startsWith('initial-'); 
+
+            // 如果不是預設留言，才顯示刪除按鈕
+            const deleteButtonHtml = isInitial 
+                ? '' 
+                : `<button class="delete-button" data-id="${comment.id}">刪除</button>`;
+
             commentItem.innerHTML = `
                 <p class="comment-meta">
                     <strong>${comment.name}</strong> 於 ${comment.date} 留言 
-                    <button class="delete-button" data-id="${comment.id}">刪除</button>
-                </p>
+                    ${deleteButtonHtml} </p>
                 <p class="comment-text">「${comment.content}」</p>
             `;
             return commentItem;
@@ -715,6 +724,14 @@
 
         // 核心新增函數：處理刪除留言
         function deleteComment(commentId) {
+            // 【修改點】在執行刪除前檢查 ID 是否為預設留言
+            if (commentId.startsWith('initial-')) {
+                // 如果是預設留言，彈出自定義提示 (使用我們剛才建立的 showCustomAlert)
+                showCustomAlert("預設留言不能刪除。");
+                return;
+            }
+
+            // 使用自定義確認框（如果您有實作的話，否則繼續使用原生 confirm）
             if (!confirm("確定要刪除這則留言嗎？")) {
                 return;
             }
@@ -730,7 +747,7 @@
 
             // 4. 重新渲染列表
             renderComments();
-            alert('留言已刪除。');
+            showCustomAlert('留言已刪除。'); // 使用自定義 alert
         }
 
         // 載入並渲染所有留言 (修正重點在這裡)
@@ -842,6 +859,7 @@
 
 </body>
 </html>
+
 
 
 
