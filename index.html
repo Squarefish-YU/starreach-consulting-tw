@@ -899,16 +899,6 @@
             if (window.localStorage) {
                 renderComments();
                 formElement.addEventListener('submit', handleFormSubmit);
-			
-			commentListElement.addEventListener('click', (event) => {
-            const target = event.target;
-            
-            // 檢查被點擊的元素是否包含 'delete-button' 類名
-            if (target.classList.contains('delete-button')) {
-                const idToDelete = target.dataset.id;
-                deleteComment(idToDelete);
-            }
-        });
             } else {
                 // 瀏覽器不支援 localStorage 時的提示
                 console.error('您的瀏覽器不支援本地儲存，留言功能將無法運作。');
@@ -987,6 +977,7 @@
 
 </body>
 </html>
+
 
 
 
