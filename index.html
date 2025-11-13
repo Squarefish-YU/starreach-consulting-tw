@@ -597,24 +597,25 @@
         <p>&copy; 2025 星際諮詢有限公司 (StarReach Consulting Ltd.) 版權所有。</p>
     </footer>
 
-	    <script>
+    <script>
         const STORAGE_KEY = 'starreach_guestbook_comments';
 
         // 輔助函數：生成一個簡單的唯一 ID
         function generateId() {
+            // 確保 ID 在同一毫秒內也是唯一的
             return Date.now().toString(36) + Math.random().toString(36).substring(2);
         }
 
-        // 初始範例留言 (增加 id 屬性)
+        // 初始範例留言 (已包含 ID)
         const initialComments = [
             {
-                id: generateId(), // 新增 ID
+                id: generateId(), 
                 name: "王先生",
                 date: "2025-11-08",
                 content: "貴公司的策略顧問沈柏霖先生提供的市場分析非常精闢，讓我們在面對新興市場時更有信心，流程優化建議也立竿見影！"
             },
             {
-                id: generateId(), // 新增 ID
+                id: generateId(), 
                 name: "李小姐 (XX 科技)",
                 date: "2025-11-01",
                 content: "感謝倪佟識顧問協助我們重新梳理了內部的管理流程，效率大幅提升。專業且效率極高。"
@@ -624,11 +625,11 @@
         const commentListElement = document.getElementById('commentList');
         const formElement = document.getElementById('guestbookForm');
 
-        // 渲染單條留言的 HTML (新增刪除按鈕)
+        // 渲染單條留言的 HTML (包含刪除按鈕)
         function createCommentElement(comment) {
             const commentItem = document.createElement('div');
             commentItem.className = 'comment-item';
-            commentItem.dataset.commentId = comment.id; // 將 ID 設置為 data 屬性，方便查找
+            commentItem.dataset.commentId = comment.id; 
             
             commentItem.innerHTML = `
                 <p class="comment-meta">
@@ -640,7 +641,7 @@
             return commentItem;
         }
 
-        // **核心新增函數：處理刪除留言**
+        // 核心新增函數：處理刪除留言
         function deleteComment(commentId) {
             if (!confirm("確定要刪除這則留言嗎？")) {
                 return;
@@ -660,7 +661,7 @@
             alert('留言已刪除。');
         }
 
-        // 載入並渲染所有留言
+        // 載入並渲染所有留言 (修正重點在這裡)
         function renderComments() {
             let comments;
             try {
@@ -670,11 +671,29 @@
                 comments = null;
             }
             
+            let shouldUpdateStorage = false; // 追蹤是否需要更新 localStorage
+
             if (!comments || comments.length === 0) {
-                // 如果 localStorage 中沒有資料，則使用初始範例並存入
+                // 如果 localStorage 中沒有資料，則使用初始範例
                 comments = initialComments;
+                shouldUpdateStorage = true;
+            } else {
+                // **【修正重點】**
+                // 檢查現有留言是否有 ID，若沒有則新增，並標記需更新
+                comments = comments.map(comment => {
+                    if (!comment.id) {
+                        comment.id = generateId();
+                        shouldUpdateStorage = true;
+                    }
+                    return comment;
+                });
+            }
+            
+            // 如果有留言被賦予了 ID，就存回 localStorage
+            if (shouldUpdateStorage) {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(comments));
             }
+
 
             // 清空現有列表
             commentListElement.innerHTML = '';
@@ -684,7 +703,7 @@
                 commentListElement.appendChild(createCommentElement(comment));
             });
             
-            // **新增：為所有刪除按鈕綁定事件監聽器**
+            // 為所有刪除按鈕綁定事件監聽器
             document.querySelectorAll('.delete-button').forEach(button => {
                 button.addEventListener('click', (event) => {
                     const idToDelete = event.target.dataset.id;
@@ -712,7 +731,7 @@
             const day = String(now.getDate()).padStart(2, '0');
 
             const newComment = {
-                id: generateId(), // **新增：為新留言生成唯一 ID**
+                id: generateId(), // 為新留言生成唯一 ID
                 name: nameInput.value,
                 date: `${year}-${month}-${day}`, // YYYY-MM-DD 格式
                 content: contentInput.value
@@ -751,6 +770,7 @@
 
 </body>
 </html>
+
 
 
 
