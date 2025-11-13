@@ -516,6 +516,17 @@ body {
     display: none !important;
 }
 
+/* 4. 新增更強制的選擇器，隱藏頂部橫幅及其可能產生的位移 */
+html.translated-rm-topbar body {
+    margin-top: 0 !important;
+    top: 0 !important;
+}
+
+/* 隱藏可能的頂部遮罩 */
+#goog-gt-vt {
+    display: none !important;
+}
+
         /* --- RWD 樣式結束 --- */
 
     </style>
@@ -1006,6 +1017,7 @@ body {
 
 </body>
 </html>
+
 
 
 
