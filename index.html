@@ -328,28 +328,28 @@
                 padding: 10px;
             }
 
-            /* 讓導覽列垂直堆疊 */
+            /* 導覽列：保持水平排列 */
             header {
-                flex-direction: column; /* 垂直排列 */
-                align-items: flex-start; /* 靠左對齊 */
-                padding: 15px;
+                /* 保持預設的 display: flex; (水平) */
+                padding: 15px; 
             }
-        nav ul {
-            list-style: none;
-            display: flex;
-        }
-        nav li {
-            margin-left: 25px;
-        }
-        nav a {
-            text-decoration: none;
-            color: #555;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-        nav a:hover {
-            color: #004a99;
-        }
+
+            /* 導覽項目：保持水平排列 */
+            nav ul {
+                /* 保持預設的 display: flex; (水平) */
+                margin-top: 0;
+                /* 為了讓所有項目塞進去，稍微縮小項目間距 */
+                justify-content: flex-end; 
+                flex-wrap: wrap; /* 允許換行 */
+            }
+            nav li {
+                /* 稍微縮小項目間距 */
+                margin-left: 10px; 
+                margin-bottom: 5px; /* 項目換行時的間距 */
+            }
+            nav li:first-child {
+                margin-left: 0;
+            }
 
             /* 縮小 Hero 區塊的字體與間距 */
             .hero {
@@ -583,12 +583,12 @@
         const initialComments = [
             {
                 name: "王先生",
-                date: "2024-11-12",
+                date: "2025-11-12",
                 content: "貴公司的策略顧問沈柏霖先生提供的市場分析非常精闢，讓我們在面對新興市場時更有信心，流程優化建議也立竿見影！"
             },
             {
                 name: "李小姐 (XX 科技)",
-                date: "2024-11-01",
+                date: "2025-11-01",
                 content: "感謝倪佟識顧問協助我們重新梳理了內部的管理流程，效率大幅提升。專業且效率極高。"
             }
         ];
@@ -672,7 +672,7 @@
             document.getElementById('comment-email').value = ''; 
             
             // 給予使用者反饋
-            alert('留言成功送出！留言已儲存在您的瀏覽器中。');
+            alert('留言成功送出！');
         }
 
         // 初始化：載入留言並綁定事件
@@ -688,5 +688,6 @@
     </script>
 </body>
 </html>
+
 
 
