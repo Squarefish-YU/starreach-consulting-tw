@@ -872,17 +872,19 @@
         });
     </script>
 <script type="text/javascript">
-    // 初始化 Google 翻譯元件
     function googleTranslateElementInit() {
       new google.translate.TranslateElement(
         {
           pageLanguage: 'zh-TW', // 您的網站原始語言 (繁體中文)
-          // 如果您想限定只顯示特定的幾種語言，可以使用 includedLanguages 參數，例如：
-          // includedLanguages: 'zh-TW,en,ja,ko', 
-          layout: google.translate.TranslateElement.InlineLayout.SIMPLE, // 顯示模式：簡單的下拉選單
-          autoDisplay: false // 避免自動彈出
+          
+          // **【新增參數】**：指定要顯示在選單中的語言，用逗號分隔
+          // 範例：繁體中文、英文、日文、韓文、法文、西班牙文
+          includedLanguages: 'zh-TW,en,ja,ko,fr,es', 
+          
+          layout: google.translate.TranslateElement.InlineLayout.SIMPLE, 
+          autoDisplay: false
         }, 
-        'google_translate_element' // 呼叫第一步中設定的 HTML 元素 ID
+        'google_translate_element'
       );
     }
 </script>
@@ -890,6 +892,7 @@
 
 </body>
 </html>
+
 
 
 
