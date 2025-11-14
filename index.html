@@ -34,7 +34,8 @@
 			position: fixed; 
 		    top: 40px; 
 		    width: 100%; 
-		    padding: 15px 30px; 
+		    left: 0;    /* 從左邊緣開始 */
+			right: 0;   /* 確保不會因邊界溢出 */
 		    z-index: 1001;
         }
 		
@@ -78,6 +79,17 @@
 		    z-index: 1000; /* 確保它在導覽列之下，但在內容之上 */
 		    border-bottom: 1px solid #ddd; /* 增加一條細線，保持設計感 */
 		}
+		
+		/* --- 1.2. 新增 Header 內部容器以實現內容居中 --- */
+		.header-content-wrapper {
+		    max-width: 960px; /* 與您的 .container 保持一致的最大寬度 */
+		    margin: 0 auto;   /* 居中對齊 */
+		    width: 100%;      /* 內部填滿寬度 */
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    padding: 0 20px; /* 為了防止內容貼邊，增加左右 padding */
+		}		
 		
         /* --- 2. 主視覺 (Hero Section) --- */
         .hero {
@@ -545,6 +557,7 @@ header {
 <body>
 	<div id="top-padding-bar"></div>
     <header>
+		<div class="header-content-wrapper">
 	    <div style="display: flex; align-items: center;">
         <div class="logo">✨ 星睿顧問 ✨</div>
 
@@ -1073,3 +1086,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+
