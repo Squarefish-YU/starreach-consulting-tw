@@ -12,7 +12,7 @@
         }
         body{margin:0;background:linear-gradient(180deg,#eef3ff 0%,var(--bg) 100%);color:#111;}
         header{background:#1f2a44;color:#fff;padding:20px 18px;display:flex;align-items:center;gap:14px;}
-        header .logo{width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#ffd166,#ef476f);display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+        header .logo{width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#2b8cff 0%,#0047b3 100%);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:24px;box-shadow:0 4px 14px rgba(0,0,0,.12)}
         header h1{margin:0;font-size:20px;letter-spacing:1px}
         .container{max-width:980px;margin:18px auto;padding:0 16px;}
         .toolbar{display:flex;gap:12px;align-items:center;margin:12px 0}
@@ -23,29 +23,71 @@
         .card{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(17,24,39,.06)}
         .group-info h2{margin:0 0 6px 0}
         .badge{display:inline-block;padding:6px 8px;border-radius:999px;background:#eef5ff;color:var(--accent);font-weight:600;font-size:13px}
+        
+        /* 🌟 修改點 1: 讓貼文內的 tag 繼承預設藍色，並保持可點擊 */
+        .post .content .badge{cursor:pointer}
+        aside .badge{cursor:pointer} /* 🌟 新增：讓側邊欄 tag 也有點擊游標 */
+
         .new-post{display:flex;gap:10px;align-items:flex-start}
         .avatar{width:44px;height:44px;border-radius:8px;background:#eee;display:flex;align-items:center;justify-content:center;font-weight:700;color:#666}
-        textarea{width:100%;min-height:78px;padding:10px;border-radius:10px;border:1px solid #e6edf8;resize:vertical}
+        textarea{width:95%;min-height:78px;padding:10px;border-radius:10px;border:1px solid #e6edf8;resize:vertical}
         .meta{display:flex;gap:8px;align-items:center;margin-top:8px}
         .posts{display:flex;flex-direction:column;gap:12px}
         .post{padding:12px;border-radius:10px;border:1px solid #f0f3fb;background:linear-gradient(180deg,#fff,#fbfdff)}
         .post .top{display:flex;gap:10px;align-items:center}
         .post .who{font-weight:700}
         .post .time{color:var(--muted);font-size:13px;margin-left:6px}
-        .post .content{margin:8px 0;color:#222;white-space:pre-wrap}
+        .post .content{margin:8px 0;color:#222;white-space:pre-wrap;line-height:1.6}
         .actions{display:flex;gap:12px;align-items:center;color:var(--muted);font-size:14px}
         .actions button{background:transparent;border:0;color:var(--muted);cursor:pointer;padding:6px;border-radius:8px}
         .like.active{color:var(--accent);font-weight:700}
         .reply-list{margin-top:8px;padding-left:48px;display:flex;flex-direction:column;gap:6px}
         .reply{background:#f7f9ff;border-radius:8px;padding:8px;font-size:14px;color:#333}
         footer{margin:26px 0 60px 0;color:var(--muted);text-align:center}
+        
+        /* 🌟 新增點 2: 篩選條件顯示區塊的樣式 */
+        .filter-container {
+            display: none; /* 預設隱藏 */
+            align-items: center;
+            gap: 8px;
+            background: var(--card);
+            padding: 10px 12px;
+            border-radius: 10px;
+            margin-top: 12px;
+            border: 1px solid #eef5ff;
+        }
+        .filter-container span:first-child {
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .filter-container .cancel-btn {
+            background: var(--muted);
+            color: white;
+            border: 0;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            font-weight: 700;
+            padding: 0;
+            margin-left: auto; /* 推到最右邊 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .filter-container .cancel-btn:hover {
+            background: var(--danger);
+        }
+
         @media(max-width:860px){.layout{grid-template-columns:1fr} .toolbar{flex-direction:column;align-items:stretch}}
     </style>
 </head>
 
 <body>
     <header>
-        <div class="logo">星</div>
+        <div class="logo">✨</div>
         <div>
             <h1>靠北星睿</h1>
             <div style="font-size:13px;color:rgba(255,255,255,.85)">匿名發洩、職場心得、辦公室小劇場</div>
@@ -72,10 +114,11 @@
                 <div class="card" style="margin-top:12px">
                     <h3 style="margin:0 0 8px 0">熱門標籤</h3>
                     <div style="display:flex;flex-wrap:wrap;gap:8px">
-                        <span class="badge">#摸魚</span>
+                        <span class="badge">#薪水小偷</span>
                         <span class="badge">#會議地獄</span>
-                        <span class="badge">#匿名吐槽</span>
-                        <span class="badge">#資訊斷層</span>
+                        <span class="badge">#辦公室抓馬</span>
+                        <span class="badge">#午餐吃什麼</span>
+						<span class="badge">#我的肝</span>
                     </div>
                 </div>
             </aside>
@@ -89,10 +132,19 @@
                             <div class="meta">
                                 <label style="color:var(--muted);font-size:13px">分類：
                                     <select id="category" style="margin-left:8px;padding:6px;border-radius:8px;border:1px solid #e6edf8">
-                                        <option>日常</option>
-                                        <option>會議</option>
-                                        <option>同事</option>
-                                        <option>其他</option>
+                                        <option>辦公室抓馬</option>
+                                        <option>會議地獄</option>
+										<option>簡報PPT</option>
+                                        <option>雷包</option>
+                                        <option>薪水小偷</option>
+										<option>吐槽</option>
+										<option>資訊斷層</option>
+										<option>我的肝</option>
+										<option>責任制是個笑話</option>
+										<option>做功德</option>
+										<option>午餐吃什麼</option>
+										<option>摸魚</option>
+										<option>星期一症候群</option>
                                     </select>
                                 </label>
                                 <div style="flex:1"></div>
@@ -101,6 +153,8 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="filter-display" class="filter-container"></div>
 
                 <div id="posts" class="posts" style="margin-top:12px">
                     </div>
@@ -112,41 +166,59 @@
     </main>
 
     <script>
-        // 範例貼文（取自先前精選吐槽）
+        // 範例貼文
         const sample = [
-         {who:'靠北星睿 9486', text:'我們部門不是人少，是因為有些人一天只出現二十分鐘，所以看起來像多。', time:'剛剛', likes:3, replies:[]},
-         {who:'靠北星睿 9485', text:'我不是不想開會，是我懷疑一旦開始，他會講到連我的靈魂都要加班。', time:'5分鐘前', likes:5, replies:[]},
-         {who:'靠北星睿 9484', text:'某人每次說「我來處理」都像詐騙簡訊，我都會先截圖存證。', time:'10分鐘前', likes:6, replies:[]},
-         {who:'靠北星睿 9483', text:'他那個笑容喔……一看就是「想拜託你幫忙但裝成沒事」的預兆。', time:'15分鐘前', likes:2, replies:[]},
-         {who:'靠北星睿 9482', text:'我最害怕的不是工作量，而是有人突然說「等一下，我想到一個更好的做法」。', time:'20分鐘前', likes:4, replies:[]},
-         {who:'靠北星睿 9481', text:'我們開發部的精神圖騰就是：不管做對做錯，先被罵再說。', time:'30分鐘前', likes:1, replies:[]},
-         {who:'靠北星睿 9480', text:'有些同事在公司活得像稀有動物，三個月看到一次還會懷疑是幻覺。', time:'昨天', likes:7, replies:[]}
-        ];
-    
-        // -----------------------------------------------------------------
-        // 🌟 修改點 1: 設定流水號起始值
-        // -----------------------------------------------------------------
+          {who:'靠北星睿 9486', text:'#薪水小偷\n我們部門不是人少，是因為有些人一天只出現二十分鐘，所以看起來像多。', time:'剛剛', likes:3, replies:[]},
+          {who:'靠北星睿 9485', text:'#會議地獄\n我不是不想開會，是我懷疑一旦開始，他會講到連我的靈魂都要加班。', time:'5分鐘前', likes:5, replies:[]},
+          {who:'靠北星睿 9484', text:'#辦公室抓馬\n某人每次說「我來處理」都像詐騙簡訊，我都會先截圖存證。', time:'10分鐘前', likes:6, replies:[]},
+          {who:'靠北星睿 9483', text:'#雷包\n他那個笑容喔……一看就是「想拜託你幫忙但裝成沒事」的預兆。', time:'15分鐘前', likes:2, replies:[]},
+          {who:'靠北星睿 9482', text:'#責任制是個笑話\n我最害怕的不是工作量，而是有人突然說「等一下，我想到一個更好的做法」。', time:'20分鐘前', likes:4, replies:[]},
+          {who:'靠北星睿 9481', text:'#我的肝\n我們開發部的精神圖騰就是：不管做對做錯，先被罵再說。', time:'30分鐘前', likes:1, replies:[]},
+          {who:'靠北星睿 9480', text:'#午餐吃什麼\n每天中午問一次「今天要吃什麼」的循環，消耗的腦力比寫程式碼還多。', time:'昨天早上 11:30', likes:7, replies:[]},
+          {who:'靠北星睿 9479', text:'#簡報PPT\n老闆每次都說他喜歡簡潔有力，但我的 30 頁 PPT 一拿出來，他就開始問說：「為什麼沒有動畫效果？」', time:'昨天晚上 9:00', likes:9, replies:[]},
+          {who:'靠北星睿 9478', text:'#我的肝 #責任制是個笑話\n當你發現你的咖啡杯變成公司的象徵物時，就知道你的工作已經不是工作，是信仰了。', time:'昨天中午 12:00', likes:12, replies:[]},
+          {who:'靠北星睿 9477', text:'#辦公室抓馬\n隔壁部門的 A 聽到 B 跟主管抱怨，B 沒抱怨 C，結果 A 跑去跟 C 說 B 在抱怨他。我只是一個旁觀者，謝謝。', time:'昨天晚上 7:30', likes:5, replies:[]},
+          {who:'靠北星睿 9476', text:'#資訊斷層\n主管：「這件事我之前在電梯裡提過。」 我：？？？', time:'昨天下午 4:45', likes:15, replies:[]},
+          {who:'靠北星睿 9475', text:'#午餐吃什麼\n每天午餐都像在玩輪盤，今天賭輸了，只好下午怒喝一杯珍奶安慰自己。', time:'昨天中午 11:50', likes:8, replies:[]},
+          {who:'靠北星睿 9474', text:'#薪水小偷\n隔壁老王工位永遠空著，但他交接時檔案永遠是最多的，這才是真正的時間管理大師。', time:'前天下午 5:00', likes:11, replies:[]},
+          {who:'靠北星睿 9473', text:'#做功德\n已經連續三天被凹做非職責內的工作了。我上輩子是燒了多大的香，這輩子來當活菩薩？', time:'前天晚上 8:30', likes:13, replies:[]},
+          {who:'靠北星睿 9472', text:'#摸魚\n偷偷在電腦上開了一個Excel，假裝在認真看數據，其實在看影片。老闆經過記得切換視窗！', time:'前天上午 10:30', likes:7, replies:[]},
+          {who:'靠北星睿 9471', text:'#雷包\n某同事說要幫忙，結果是幫倒忙，現在我要花雙倍時間來修復他造成的「貢獻」。', time:'前天晚上 7:00', likes:9, replies:[]},
+          {who:'靠北星睿 9470', text:'#會議地獄\n開會時，主管永遠把「集思廣益」講成「我說什麼你們就說好」。', time:'上週五下午 3:00', likes:18, replies:[]},
+          {who:'靠北星睿 9469', text:'#辦公室抓馬\n總務部門的那個咖啡機之戰已經持續三年了，到底誰該負責補咖啡豆？每天早上都像一場生存遊戲。', time:'上週四上午 9:30', likes:4, replies:[]},
+          {who:'靠北星睿 9468', text:'#我的肝\n週末被通知要緊急處理問題，我只是想知道，這份薪水到底有沒有包含我的靈魂？', time:'上週三晚上 10:00', likes:16, replies:[]},
+          {who:'靠北星睿 9467', text:'#星期一症候群\n鬧鐘響的那一刻，我突然理解了「人生如戲，全靠演技」的真諦。', time:'上週一早上 7:00', likes:20, replies:[]},
+          {who:'靠北星睿 9466', text:'#資訊斷層\n昨天剛把文件發給全組，今天主管就問我：「這件事為什麼沒有任何書面紀錄？」', time:'上週二下午 2:00', likes:6, replies:[]},
+          {who:'靠北星睿 9465', text:'#薪水小偷\n有些同事在公司活得像稀有動物，三個月看到一次還會懷疑是幻覺。', time:'上週二中午 12:15', likes:7, replies:[]},
+          {who:'靠北星睿 9464', text:'#午餐吃什麼\n外送訂了香辣雞腿堡，結果辣油只滴了一滴在雞皮上，還不如叫水煮餐。好氣！', time:'上週一中午 1:00', likes:3, replies:[]}
+        ];
+        // 流水號起始值
         let nextPostId = 9487;
 
         const postsEl = document.getElementById('posts');
         const qEl = document.getElementById('q');
     
+        function processContent(text) {
+            let safeText = escapeHtml(text);
+            safeText = safeText.replace(/(?:^|\s)(#[\w\u4e00-\u9fa5]+)/g, (match, tag) => {
+                const prefix = match.startsWith('#') ? '' : ' ';
+                return `${prefix}<span class="badge">${tag}</span>`;
+            });
+            return safeText;
+        }
+
         function renderPosts(list){
          postsEl.innerHTML = '';
          list.forEach((p, idx)=>{
            const div = document.createElement('div');
            div.className = 'post';
-           // -----------------------------------------------------------------
-           // 🌟 修改點 2: 渲染時檢查 isOwner 屬性，決定是否顯示刪除按鈕
-           // 並且對 p.who 也使用 escapeHtml 增加安全性
-           // -----------------------------------------------------------------
            div.innerHTML = `
              <div class="top"><div class="avatar" style="width:36px;height:36px;border-radius:6px">#</div>
                <div>
                  <div><span class="who">${escapeHtml(p.who)}</span><span class="time"> · ${p.time}</span></div>
                </div>
              </div>
-             <div class="content">${escapeHtml(p.text)}</div>
+             <div class="content">${processContent(p.text)}</div> 
              <div class="actions">
                <button class="like" data-i="${idx}">❤ <span class="count">${p.likes}</span></button>
                <button class="replyBtn" data-i="${idx}">💬 回覆</button>
@@ -157,19 +229,14 @@
            `;
            postsEl.appendChild(div);
          });
-         // 🌟 修改點 3: 將 list 傳入 attachEvents，以便刪除時能正確操作
          attachEvents(list);
         }
     
-        // 🌟 修改點 4: attachEvents 接收 list 參數，並新增刪除事件
         function attachEvents(list){
          document.querySelectorAll('.like').forEach(btn=>{
            btn.onclick = ()=>{
              const i = btn.dataset.i;
-             // 注意：此處修改 list[i].likes 仍可能因為搜尋過濾而與 sample 不同步
-             // 更好的做法是操作 sample，但此處為求簡單，暫時保留
-             // **更新**：為避免 bug，我們假設點讚不需同步回 sample
-             list[i].likes++; // 操作當前列表
+             list[i].likes++;
              btn.querySelector('.count').textContent = list[i].likes;
              btn.classList.add('active');
            };
@@ -179,9 +246,8 @@
              const i = b.dataset.i;
              const r = prompt('匿名回覆：');
              if(r) {
-               // 同上，操作 list (可能是 sample 或 filtered)
                list[i].replies.push(r); 
-               renderReply(i, list); // 傳入 list
+               renderReply(i, list);
              }
            }
          });
@@ -189,82 +255,136 @@
            b.onclick = ()=>alert('分享功能僅示範用（本地）');
          });
 
-         // 🌟 修改點 5: 新增刪除按鈕的事件綁定
          document.querySelectorAll('.deleteBtn').forEach(btn => {
             btn.onclick = () => {
-                const i = btn.dataset.i; // 這是 list (可能是 sample 或 filtered) 中的 index
-                
+                const i = btn.dataset.i;
                 if (confirm('確定要刪除這則貼文嗎？')) {
                     const postToDelete = list[i];
-                    
-                    // 關鍵：我們必須從 'sample' (原始資料) 中找到並刪除
                     const originalIndex = sample.findIndex(p => p === postToDelete);
                     if (originalIndex > -1) {
                         sample.splice(originalIndex, 1);
                     }
-                    
-                    // 刪除後，清除搜尋條件並重新渲染完整的 sample 列表
-                    qEl.value = '';
-                    renderPosts(sample);
+                    // 🌟 修改點：呼叫 clearSearchFilter
+                    clearSearchFilter();
                 }
             }
         });
+
+        document.querySelectorAll('.post .content .badge').forEach(badge => {
+            badge.onclick = () => {
+                const tag = badge.textContent.trim();
+                qEl.value = tag;
+                document.getElementById('btnSearch').click();
+            };
+        });
         }
     
-        // 修改 renderReply 以接收 list
         function renderReply(i, list){
          const container = document.getElementById('replies-'+i);
          container.innerHTML = '';
-         // 使用傳入的 list 來渲染回覆
          list[i].replies.forEach(r=>{
            const el = document.createElement('div');
            el.className = 'reply';
-           el.textContent = r; // textContent 會自動跳脫 HTML，較安全
+           el.textContent = r;
            container.appendChild(el);
          });
         }
     
         // escape
         function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
-    
+        
+
+        // -----------------------------------------------------------------
+        // 🌟 新增點 4: 顯示篩選條件的函式
+        // -----------------------------------------------------------------
+        function showFilterDisplay(q) {
+            const filterEl = document.getElementById('filter-display');
+            filterEl.innerHTML = `
+                <span>篩選條件：</span>
+                <span class="badge">${escapeHtml(q)}</span>
+                <button id="clearSearchBtn" class="cancel-btn" title="清除篩選">X</button>
+            `;
+            filterEl.style.display = 'flex';
+            // 綁定清除按鈕
+            document.getElementById('clearSearchBtn').onclick = clearSearchFilter;
+        }
+
+        // -----------------------------------------------------------------
+        // 🌟 新增點 5: 清除篩選的函式 (多處共用)
+        // -----------------------------------------------------------------
+        function clearSearchFilter() {
+            const filterEl = document.getElementById('filter-display');
+            filterEl.innerHTML = '';
+            filterEl.style.display = 'none';
+            qEl.value = '';
+            renderPosts(sample); // 重新渲染完整列表
+        }
+
         // init
         renderPosts(sample);
     
         // -----------------------------------------------------------------
-        // 🌟 修改點 6: 修改發文邏輯
+        // 🌟 新增點 6: 讓側邊欄的熱門標籤可點擊 (只需綁定一次)
+        // -----------------------------------------------------------------
+        document.querySelectorAll('aside .badge').forEach(badge => {
+            badge.onclick = () => {
+                const tag = badge.textContent.trim();
+                qEl.value = tag;
+                document.getElementById('btnSearch').click();
+            };
+        });
+
+        // -----------------------------------------------------------------
+        // 🌟 修改點 7: 發文按鈕
         // -----------------------------------------------------------------
         document.getElementById('postBtn').onclick = ()=>{
          const txt = document.getElementById('postText').value.trim();
          if(!txt){ alert('請輸入內容'); return; }
 
-         // 建立新貼文物件
+         const categoryEl = document.getElementById('category');
+         const category = categoryEl.value;
+         let postTextWithTag = txt;
+
+         if (category !== '日常' && category !== '其他') {
+             postTextWithTag = `#${category}\n\n${txt}`;
+         }
+
          const newPost = {
-            who: '靠北星睿 ' + nextPostId, // 使用流水號
-            text: txt, 
+            who: '靠北星睿 ' + nextPostId,
+            text: postTextWithTag,
             time: '剛剛', 
             likes: 0, 
             replies: [], 
-            isOwner: true // 標記為使用者自己的貼文
+            isOwner: true
          };
-         nextPostId++; // 流水號遞增
+         nextPostId++;
 
-         sample.unshift(newPost); // 加到資料陣列最前面
-         document.getElementById('postText').value='';
+         sample.unshift(newPost);
          
-         // 發文後，清空搜尋並渲染完整列表
-         qEl.value = '';
-         renderPosts(sample);
+         document.getElementById('postText').value='';
+         categoryEl.selectedIndex = 0;
+         
+         // 🌟 修改點：呼叫 clearSearchFilter
+         clearSearchFilter();
         };
     
         // 新增表單快速鍵
         document.getElementById('btnNew').onclick = ()=>document.getElementById('postText').focus();
     
-        // 搜尋（簡單）
+        // -----------------------------------------------------------------
+        // 🌟 修改點 8: 搜尋按鈕
+        // -----------------------------------------------------------------
         document.getElementById('btnSearch').onclick = ()=>{
          const q = qEl.value.trim().toLowerCase();
-         if(!q){ renderPosts(sample); return; }
+         if(!q){ 
+            clearSearchFilter(); // 如果搜尋為空，也呼叫清除
+            return; 
+         }
+         // 搜尋時，同時檢查 p.text 和 p.who
          const filtered = sample.filter(p=>p.text.toLowerCase().includes(q) || p.who.toLowerCase().includes(q));
          renderPosts(filtered);
+         // 🌟 顯示篩選條件 (傳入原始 qEl.value 以保留大小寫)
+         showFilterDisplay(qEl.value.trim()); 
         };
     
         // Enter 搜尋
