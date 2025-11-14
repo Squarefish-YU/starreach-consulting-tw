@@ -1,216 +1,220 @@
-下面是完整的 HTML 檔案內容（存成 kaobei_xingrui.html 開啟即可）。包含：社團標題、貼文列表、發文表單（前端即時加入）、搜尋與簡單互動（按讚、回覆）。直接複製整段並存檔使用。
-
 <!doctype html>
 <html lang="zh-Hant">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>靠北星睿</title>
-  <style>
-    :root{
-      --bg:#f5f7fb; --card:#ffffff; --muted:#7a7f86; --accent:#2b8cff; --danger:#ff6b6b;
-      font-family: "Noto Sans TC", "Helvetica Neue", Arial, sans-serif;
-    }
-    body{margin:0;background:linear-gradient(180deg,#eef3ff 0%,var(--bg) 100%);color:#111;}
-    header{background:#1f2a44;color:#fff;padding:20px 18px;display:flex;align-items:center;gap:14px;}
-    header .logo{width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#ffd166,#ef476f);display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.12)}
-    header h1{margin:0;font-size:20px;letter-spacing:1px}
-    .container{max-width:980px;margin:18px auto;padding:0 16px;}
-    .toolbar{display:flex;gap:12px;align-items:center;margin:12px 0}
-    .search{flex:1;display:flex;gap:8px}
-    input[type="search"]{flex:1;padding:10px 12px;border-radius:8px;border:1px solid #dee6f5;background:#fff}
-    button{padding:10px 12px;border-radius:8px;border:0;background:var(--accent);color:#fff;cursor:pointer}
-    .layout{display:grid;grid-template-columns:320px 1fr;gap:18px}
-    .card{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(17,24,39,.06)}
-    .group-info h2{margin:0 0 6px 0}
-    .badge{display:inline-block;padding:6px 8px;border-radius:999px;background:#eef5ff;color:var(--accent);font-weight:600;font-size:13px}
-    .new-post{display:flex;gap:10px;align-items:flex-start}
-    .avatar{width:44px;height:44px;border-radius:8px;background:#eee;display:flex;align-items:center;justify-content:center;font-weight:700;color:#666}
-    textarea{width:100%;min-height:78px;padding:10px;border-radius:10px;border:1px solid #e6edf8;resize:vertical}
-    .meta{display:flex;gap:8px;align-items:center;margin-top:8px}
-    .posts{display:flex;flex-direction:column;gap:12px}
-    .post{padding:12px;border-radius:10px;border:1px solid #f0f3fb;background:linear-gradient(180deg,#fff,#fbfdff)}
-    .post .top{display:flex;gap:10px;align-items:center}
-    .post .who{font-weight:700}
-    .post .time{color:var(--muted);font-size:13px;margin-left:6px}
-    .post .content{margin:8px 0;color:#222;white-space:pre-wrap}
-    .actions{display:flex;gap:12px;align-items:center;color:var(--muted);font-size:14px}
-    .actions button{background:transparent;border:0;color:var(--muted);cursor:pointer;padding:6px;border-radius:8px}
-    .like.active{color:var(--accent);font-weight:700}
-    .reply-list{margin-top:8px;padding-left:48px;display:flex;flex-direction:column;gap:6px}
-    .reply{background:#f7f9ff;border-radius:8px;padding:8px;font-size:14px;color:#333}
-    footer{margin:26px 0 60px 0;color:var(--muted);text-align:center}
-    @media(max-width:860px){.layout{grid-template-columns:1fr} .toolbar{flex-direction:column;align-items:stretch}}
-  </style>
-</head>
-<body>
-  <header>
-    <div class="logo">星</div>
-    <div>
-      <h1>靠北星睿</h1>
-      <div style="font-size:13px;color:rgba(255,255,255,.85)">匿名發洩、職場心得、辦公室小劇場</div>
-    </div>
-  </header>
-
-  <main class="container">
-    <div class="toolbar">
-      <div class="search">
-        <input id="q" type="search" placeholder="搜尋貼文或同事..." />
-        <button id="btnSearch">搜尋</button>
-      </div>
-      <button id="btnNew">發表匿名吐槽</button>
-    </div>
-
-    <div class="layout">
-      <aside>
-        <div class="card group-info">
-          <h2>社團簡介</h2>
-          <div class="badge">匿名社團</div>
-          <p style="color:var(--muted);margin-top:10px">歡迎把職場中想說的話、好笑的日常丟上來—保持禮貌但誠實。</p>
-        </div>
-
-        <div class="card" style="margin-top:12px">
-          <h3 style="margin:0 0 8px 0">熱門標籤</h3>
-          <div style="display:flex;flex-wrap:wrap;gap:8px">
-            <span class="badge">#摸魚</span>
-            <span class="badge">#會議地獄</span>
-            <span class="badge">#匿名吐槽</span>
-            <span class="badge">#資訊斷層</span>
-          </div>
-        </div>
-      </aside>
-
-      <section>
-        <div class="card">
-          <div class="new-post">
-            <div class="avatar">你</div>
-            <div style="flex:1">
-              <textarea id="postText" placeholder="說出你心裡的那句靠北…（匿名）"></textarea>
-              <div class="meta">
-                <label style="color:var(--muted);font-size:13px">分類：
-                  <select id="category" style="margin-left:8px;padding:6px;border-radius:8px;border:1px solid #e6edf8">
-                    <option>日常</option><option>會議</option><option>同事</option><option>其他</option>
-                  </select>
-                </label>
-                <div style="flex:1"></div>
-                <button id="postBtn">發佈</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="posts" class="posts" style="margin-top:12px">
-          <!-- sample posts populated by JS -->
-        </div>
-
-      </section>
-    </div>
-
-    <footer>靠北星睿 · 只做匿名發洩，不負任何法律責任（玩笑話勿當真）</footer>
-  </main>
-
-  <script>
-    // 範例貼文（取自先前精選吐槽）
-    const sample = [
-      {who:'同事C', text:'我們部門不是人少，是因為有些人一天只出現二十分鐘，所以看起來像多。', time:'剛剛', likes:3, replies:[]},
-      {who:'同事F', text:'我不是不想開會，是我懷疑一旦開始，他會講到連我的靈魂都要加班。', time:'5分鐘前', likes:5, replies:[]},
-      {who:'同事H', text:'某人每次說「我來處理」都像詐騙簡訊，我都會先截圖存證。', time:'10分鐘前', likes:6, replies:[]},
-      {who:'同事K', text:'他那個笑容喔……一看就是「想拜託你幫忙但裝成沒事」的預兆。', time:'15分鐘前', likes:2, replies:[]},
-      {who:'同事N', text:'我最害怕的不是工作量，而是有人突然說「等一下，我想到一個更好的做法」。', time:'20分鐘前', likes:4, replies:[]},
-      {who:'同事R', text:'我們開發部的精神圖騰就是：不管做對做錯，先被罵再說。', time:'30分鐘前', likes:1, replies:[]},
-      {who:'同事X', text:'有些同事在公司活得像稀有動物，三個月看到一次還會懷疑是幻覺。', time:'昨天', likes:7, replies:[]}
-    ];
-
-    const postsEl = document.getElementById('posts');
-    const qEl = document.getElementById('q');
-
-    function renderPosts(list){
-      postsEl.innerHTML = '';
-      list.forEach((p, idx)=>{
-        const div = document.createElement('div');
-        div.className = 'post';
-        div.innerHTML = `
-          <div class="top"><div class="avatar" style="width:36px;height:36px;border-radius:6px">#</div>
-            <div>
-              <div><span class="who">${p.who}</span><span class="time"> · ${p.time}</span></div>
-            </div>
-          </div>
-          <div class="content">${escapeHtml(p.text)}</div>
-          <div class="actions">
-            <button class="like" data-i="${idx}">❤ <span class="count">${p.likes}</span></button>
-            <button class="replyBtn" data-i="${idx}">💬 回覆</button>
-            <button class="share" data-i="${idx}">⤴ 分享</button>
-          </div>
-          <div class="reply-list" id="replies-${idx}"></div>
-        `;
-        postsEl.appendChild(div);
-      });
-      attachEvents();
-    }
-
-    function attachEvents(){
-      document.querySelectorAll('.like').forEach(btn=>{
-        btn.onclick = ()=>{
-          const i = btn.dataset.i;
-          sample[i].likes++;
-          btn.querySelector('.count').textContent = sample[i].likes;
-          btn.classList.add('active');
-        };
-      });
-      document.querySelectorAll('.replyBtn').forEach(b=>{
-        b.onclick = ()=>{
-          const i = b.dataset.i;
-          const r = prompt('匿名回覆：');
-          if(r) {
-            sample[i].replies.push(r);
-            renderReply(i);
-          }
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>靠北星睿</title>
+    <style>
+        :root{
+          --bg:#f5f7fb; --card:#ffffff; --muted:#7a7f86; --accent:#2b8cff; --danger:#ff6b6b;
+          font-family: "Noto Sans TC", "Helvetica Neue", Arial, sans-serif;
         }
-      });
-      document.querySelectorAll('.share').forEach(b=>{
-        b.onclick = ()=>alert('分享功能僅示範用（本地）');
-      });
-    }
+        body{margin:0;background:linear-gradient(180deg,#eef3ff 0%,var(--bg) 100%);color:#111;}
+        header{background:#1f2a44;color:#fff;padding:20px 18px;display:flex;align-items:center;gap:14px;}
+        header .logo{width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#ffd166,#ef476f);display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+        header h1{margin:0;font-size:20px;letter-spacing:1px}
+        .container{max-width:980px;margin:18px auto;padding:0 16px;}
+        .toolbar{display:flex;gap:12px;align-items:center;margin:12px 0}
+        .search{flex:1;display:flex;gap:8px}
+        input[type="search"]{flex:1;padding:10px 12px;border-radius:8px;border:1px solid #dee6f5;background:#fff}
+        button{padding:10px 12px;border-radius:8px;border:0;background:var(--accent);color:#fff;cursor:pointer}
+        .layout{display:grid;grid-template-columns:320px 1fr;gap:18px}
+        .card{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(17,24,39,.06)}
+        .group-info h2{margin:0 0 6px 0}
+        .badge{display:inline-block;padding:6px 8px;border-radius:999px;background:#eef5ff;color:var(--accent);font-weight:600;font-size:13px}
+        .new-post{display:flex;gap:10px;align-items:flex-start}
+        .avatar{width:44px;height:44px;border-radius:8px;background:#eee;display:flex;align-items:center;justify-content:center;font-weight:700;color:#666}
+        textarea{width:100%;min-height:78px;padding:10px;border-radius:10px;border:1px solid #e6edf8;resize:vertical}
+        .meta{display:flex;gap:8px;align-items:center;margin-top:8px}
+        .posts{display:flex;flex-direction:column;gap:12px}
+        .post{padding:12px;border-radius:10px;border:1px solid #f0f3fb;background:linear-gradient(180deg,#fff,#fbfdff)}
+        .post .top{display:flex;gap:10px;align-items:center}
+        .post .who{font-weight:700}
+        .post .time{color:var(--muted);font-size:13px;margin-left:6px}
+        .post .content{margin:8px 0;color:#222;white-space:pre-wrap}
+        .actions{display:flex;gap:12px;align-items:center;color:var(--muted);font-size:14px}
+        .actions button{background:transparent;border:0;color:var(--muted);cursor:pointer;padding:6px;border-radius:8px}
+        .like.active{color:var(--accent);font-weight:700}
+        .reply-list{margin-top:8px;padding-left:48px;display:flex;flex-direction:column;gap:6px}
+        .reply{background:#f7f9ff;border-radius:8px;padding:8px;font-size:14px;color:#333}
+        footer{margin:26px 0 60px 0;color:var(--muted);text-align:center}
+        @media(max-width:860px){.layout{grid-template-columns:1fr} .toolbar{flex-direction:column;align-items:stretch}}
+    </style>
+</head>
 
-    function renderReply(i){
-      const container = document.getElementById('replies-'+i);
-      container.innerHTML = '';
-      sample[i].replies.forEach(r=>{
-        const el = document.createElement('div');
-        el.className = 'reply';
-        el.textContent = r;
-        container.appendChild(el);
-      });
-    }
+<body>
+    <header>
+        <div class="logo">星</div>
+        <div>
+            <h1>靠北星睿</h1>
+            <div style="font-size:13px;color:rgba(255,255,255,.85)">匿名發洩、職場心得、辦公室小劇場</div>
+        </div>
+    </header>
 
-    // escape
-    function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+    <main class="container">
+        <div class="toolbar">
+            <div class="search">
+                <input id="q" type="search" placeholder="搜尋貼文或同事..." />
+                <button id="btnSearch">搜尋</button>
+            </div>
+            <button id="btnNew">發表匿名吐槽</button>
+        </div>
 
-    // init
-    renderPosts(sample);
+        <div class="layout">
+            <aside>
+                <div class="card group-info">
+                    <h2>社團簡介</h2>
+                    <div class="badge">匿名社團</div>
+                    <p style="color:var(--muted);margin-top:10px">歡迎把職場中想說的話、好笑的日常丟上來—保持禮貌但誠實。</p>
+                </div>
 
-    // 發文
-    document.getElementById('postBtn').onclick = ()=>{
-      const txt = document.getElementById('postText').value.trim();
-      if(!txt){ alert('請輸入內容'); return; }
-      sample.unshift({who:'匿名', text:txt, time:'剛剛', likes:0, replies:[]});
-      document.getElementById('postText').value='';
-      renderPosts(sample);
-    };
+                <div class="card" style="margin-top:12px">
+                    <h3 style="margin:0 0 8px 0">熱門標籤</h3>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px">
+                        <span class="badge">#摸魚</span>
+                        <span class="badge">#會議地獄</span>
+                        <span class="badge">#匿名吐槽</span>
+                        <span class="badge">#資訊斷層</span>
+                    </div>
+                </div>
+            </aside>
 
-    // 新增表單快速鍵
-    document.getElementById('btnNew').onclick = ()=>document.getElementById('postText').focus();
+            <section>
+                <div class="card">
+                    <div class="new-post">
+                        <div class="avatar">你</div>
+                        <div style="flex:1">
+                            <textarea id="postText" placeholder="說出你心裡的那句靠北…（匿名）"></textarea>
+                            <div class="meta">
+                                <label style="color:var(--muted);font-size:13px">分類：
+                                    <select id="category" style="margin-left:8px;padding:6px;border-radius:8px;border:1px solid #e6edf8">
+                                        <option>日常</option>
+                                        <option>會議</option>
+                                        <option>同事</option>
+                                        <option>其他</option>
+                                    </select>
+                                </label>
+                                <div style="flex:1"></div>
+                                <button id="postBtn">發佈</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    // 搜尋（簡單）
-    document.getElementById('btnSearch').onclick = ()=>{
-      const q = qEl.value.trim().toLowerCase();
-      if(!q){ renderPosts(sample); return; }
-      const filtered = sample.filter(p=>p.text.toLowerCase().includes(q) || p.who.toLowerCase().includes(q));
-      renderPosts(filtered);
-    };
+                <div id="posts" class="posts" style="margin-top:12px">
+                    <!-- sample posts populated by JS -->
+                </div>
 
-    // Enter 搜尋
-    qEl.addEventListener('keydown',(e)=>{ if(e.key==='Enter') document.getElementById('btnSearch').click(); });
-  </script>
+            </section>
+        </div>
+
+        <footer>靠北星睿 · 只做匿名發洩，不負任何法律責任（玩笑話勿當真）</footer>
+    </main>
+
+    <script>
+        // 範例貼文（取自先前精選吐槽）
+        const sample = [
+          {who:'# 靠北星睿 9486', text:'我們部門不是人少，是因為有些人一天只出現二十分鐘，所以看起來像多。', time:'剛剛', likes:3, replies:[]},
+          {who:'# 靠北星睿 9485', text:'我不是不想開會，是我懷疑一旦開始，他會講到連我的靈魂都要加班。', time:'5分鐘前', likes:5, replies:[]},
+          {who:'# 靠北星睿 9484', text:'某人每次說「我來處理」都像詐騙簡訊，我都會先截圖存證。', time:'10分鐘前', likes:6, replies:[]},
+          {who:'# 靠北星睿 9483', text:'他那個笑容喔……一看就是「想拜託你幫忙但裝成沒事」的預兆。', time:'15分鐘前', likes:2, replies:[]},
+          {who:'# 靠北星睿 9482', text:'我最害怕的不是工作量，而是有人突然說「等一下，我想到一個更好的做法」。', time:'20分鐘前', likes:4, replies:[]},
+          {who:'# 靠北星睿 9481', text:'我們開發部的精神圖騰就是：不管做對做錯，先被罵再說。', time:'30分鐘前', likes:1, replies:[]},
+          {who:'# 靠北星睿 9480', text:'有些同事在公司活得像稀有動物，三個月看到一次還會懷疑是幻覺。', time:'昨天', likes:7, replies:[]}
+        ];
+    
+        const postsEl = document.getElementById('posts');
+        const qEl = document.getElementById('q');
+    
+        function renderPosts(list){
+          postsEl.innerHTML = '';
+          list.forEach((p, idx)=>{
+            const div = document.createElement('div');
+            div.className = 'post';
+            div.innerHTML = `
+              <div class="top"><div class="avatar" style="width:36px;height:36px;border-radius:6px">#</div>
+                <div>
+                  <div><span class="who">${p.who}</span><span class="time"> · ${p.time}</span></div>
+                </div>
+              </div>
+              <div class="content">${escapeHtml(p.text)}</div>
+              <div class="actions">
+                <button class="like" data-i="${idx}">❤ <span class="count">${p.likes}</span></button>
+                <button class="replyBtn" data-i="${idx}">💬 回覆</button>
+                <button class="share" data-i="${idx}">⤴ 分享</button>
+              </div>
+              <div class="reply-list" id="replies-${idx}"></div>
+            `;
+            postsEl.appendChild(div);
+          });
+          attachEvents();
+        }
+    
+        function attachEvents(){
+          document.querySelectorAll('.like').forEach(btn=>{
+            btn.onclick = ()=>{
+              const i = btn.dataset.i;
+              sample[i].likes++;
+              btn.querySelector('.count').textContent = sample[i].likes;
+              btn.classList.add('active');
+            };
+          });
+          document.querySelectorAll('.replyBtn').forEach(b=>{
+            b.onclick = ()=>{
+              const i = b.dataset.i;
+              const r = prompt('匿名回覆：');
+              if(r) {
+                sample[i].replies.push(r);
+                renderReply(i);
+              }
+            }
+          });
+          document.querySelectorAll('.share').forEach(b=>{
+            b.onclick = ()=>alert('分享功能僅示範用（本地）');
+          });
+        }
+    
+        function renderReply(i){
+          const container = document.getElementById('replies-'+i);
+          container.innerHTML = '';
+          sample[i].replies.forEach(r=>{
+            const el = document.createElement('div');
+            el.className = 'reply';
+            el.textContent = r;
+            container.appendChild(el);
+          });
+        }
+    
+        // escape
+        function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+    
+        // init
+        renderPosts(sample);
+    
+        // 發文
+        document.getElementById('postBtn').onclick = ()=>{
+          const txt = document.getElementById('postText').value.trim();
+          if(!txt){ alert('請輸入內容'); return; }
+          sample.unshift({who:'# 靠北星睿 9487', text:txt, time:'剛剛', likes:0, replies:[]});
+          document.getElementById('postText').value='';
+          renderPosts(sample);
+        };
+    
+        // 新增表單快速鍵
+        document.getElementById('btnNew').onclick = ()=>document.getElementById('postText').focus();
+    
+        // 搜尋（簡單）
+        document.getElementById('btnSearch').onclick = ()=>{
+          const q = qEl.value.trim().toLowerCase();
+          if(!q){ renderPosts(sample); return; }
+          const filtered = sample.filter(p=>p.text.toLowerCase().includes(q) || p.who.toLowerCase().includes(q));
+          renderPosts(filtered);
+        };
+    
+        // Enter 搜尋
+        qEl.addEventListener('keydown',(e)=>{ if(e.key==='Enter') document.getElementById('btnSearch').click(); });
+    </script>
 </body>
+
 </html>
