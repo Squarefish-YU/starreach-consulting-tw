@@ -584,7 +584,7 @@
 
         
         // =========================================================================
-        // --- 工具一: CSV/ZIP 表號比對邏輯 (新功能) ---
+        // --- 工具一: CSV/XML 表號比對邏輯 (新功能) ---
         // =========================================================================
 		(function() {
 			// 所有 ID 帶上 -compare 後綴
@@ -630,6 +630,32 @@
 			let allMissingEntries = []; 
             // 🌟 儲存**目前**篩選後的結果
             let currentFilteredEntries = [];
+
+            // --- 🌟 新增：Fallback 複製函數 (解決 file:// 或非 HTTPS 環境複製失敗問題) ---
+            function copyFallback(text) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                // 隱藏元素以避免影響佈局
+                textarea.style.position = 'fixed';
+                textarea.style.top = '0';
+                textarea.style.left = '0';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                
+                let success = false;
+                try {
+                    textarea.focus();
+                    textarea.select();
+                    // 執行複製指令 (這是舊版且在非 HTTPS 環境下最可靠的方式)
+                    success = document.execCommand('copy');
+                } catch (err) {
+                    console.error('Fallback copy failed:', err);
+                }
+                
+                document.body.removeChild(textarea);
+                return success;
+            }
+            // --- 🌟 Fallback 函數結束 ---
 
 			// --- 1. 設定拖曳事件監聽 (不變) ---
 			dropZone.addEventListener('dragover', (e) => {
@@ -869,7 +895,7 @@
                     // 🌟 清空篩選器
                     if (hescodeFilter) hescodeFilter.innerHTML = '<option value="all">所有 Hescode</option>';
 					if (filteredCountSpan) filteredCountSpan.textContent = '';
-					showCustomAlert('比對完成：全部符合！', 'success');
+					showCustomAlert('比對完成：全部符合！', 'success'); // 🌟 替換 alert
 					return;
 				}
                 
@@ -886,7 +912,7 @@
 
 				// 3. 🌟 設定 XLSX 下載按鈕 (維持下載全部)
 				if (downloadXlsxBtn) {
-					downloadXlsxBtn.style.display = 'block';
+					downloadXlsxBtn.style.display = 'inline-block'; // 調整為 inline-block 配合 Flexbox
 					downloadXlsxBtn.onclick = () => {
 						downloadXLSX(allMissingEntries); // 下載 **所有** 差異資料
 					};
@@ -914,7 +940,7 @@
                 hescodeFilter.value = 'all'; // 重設為 '所有'
             }
 
-            // --- 6.2 🌟 新增：篩選並顯示結果到表格 (同時更新複製按鈕邏輯) ---
+            // --- 6.2 🌟 修正：篩選並顯示結果到表格 (同時更新複製按鈕邏輯) ---
             function filterAndDisplayResults(allEntries, selectedHescode) {
                 let entriesToDisplay = allEntries;
                 
@@ -928,31 +954,58 @@
                 // 更新計數顯示
                 if (filteredCountSpan) filteredCountSpan.textContent = `(共 ${currentFilteredEntries.length} 筆)`;
                 
-                // --- 🌟 設定複製按鈕 (僅複製篩選後的電號+表號) ---
-                let copyString = "";
+                // --- 🌟 設定複製按鈕 (僅複製篩選後的電號+表號，**不含標題**) ---
+                let copyString = ""; 
                 currentFilteredEntries.forEach(entry => {
-                    copyString += `${entry.cust_id}\t${entry.meter_id}\n`;
+                    // 確保即使沒有 cust_id，仍以 tab 分隔
+                    const custId = entry.cust_id || '';
+                    const meterId = entry.meter_id || '';
+                    copyString += `${custId}\t${meterId}\n`;
                 });
                 
-                copyBtn.style.display = 'block'; 
+                copyBtn.style.display = 'inline-block'; // 調整為 inline-block 配合 Flexbox
+                
+                // 🌟 修正複製邏輯：優先使用 Clipboard API，失敗則使用 Fallback
                 copyBtn.onclick = () => {
-                    // 🌟 僅複製 電號 (cust_id) 和 表號 (meter_id)
                     if (currentFilteredEntries.length === 0) {
-                        showCustomAlert('目前篩選結果為空，無法複製。', 'error');
+                        showCustomAlert('目前篩選結果為空，無法複製。', 'error'); 
                         return;
                     }
-                    navigator.clipboard.writeText(copyString).then(() => {
-                        showCustomAlert(`已複製 ${currentFilteredEntries.length} 筆資料到剪貼簿 (僅電號/表號)`, 'success');
-                    }, (err) => {
-                        showCustomAlert('複製失敗! 請檢查瀏覽器權限。', 'error');
-                    });
+
+                    // 1. 嘗試使用現代 Clipboard API
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(copyString).then(() => {
+                            showCustomAlert(`已複製 ${currentFilteredEntries.length} 筆資料到剪貼簿 (僅電號/表號)`, 'success');
+                        }, (err) => {
+                            console.warn("Clipboard API 失敗，嘗試 Fallback 複製...", err);
+                            // 2. Clipboard API 失敗，嘗試 Fallback 複製
+                            if (copyFallback(copyString)) {
+                                showCustomAlert(`已複製 ${currentFilteredEntries.length} 筆資料到剪貼簿 (僅電號/表號)`, 'success');
+                            } else {
+                                // 3. Fallback 也失敗
+                                showCustomAlert('複製失敗! 請檢查瀏覽器權限或嘗試手動複製。', 'error'); 
+                            }
+                        });
+                    } else {
+                        // 1. 瀏覽器不支援 Clipboard API，直接使用 Fallback
+                        if (copyFallback(copyString)) {
+                            showCustomAlert(`已複製 ${currentFilteredEntries.length} 筆資料到剪貼簿 (僅電號/表號)`, 'success');
+                        } else {
+                            // 2. Fallback 失敗
+                            showCustomAlert('複製失敗! 瀏覽器不支援自動複製，請手動複製結果。', 'error'); 
+                        }
+                    }
                 };
+                // --- 複製邏輯修正結束 ---
                 
                 // --- 渲染表格 ---
                 resultBody.innerHTML = ''; 
                 
                 if (entriesToDisplay.length === 0) {
                     resultBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">無符合篩選條件的資料</td></tr>';
+                    // 隱藏複製/下載按鈕
+                    copyBtn.style.display = 'none';
+                    if (downloadXlsxBtn) downloadXlsxBtn.style.display = 'none'; 
                     return;
                 }
                 
@@ -995,7 +1048,7 @@
 			// --- 7. 下載 XLSX (維持下載全部) ---
 			function downloadXLSX(data) {
 				if (typeof XLSX === 'undefined') {
-					showCustomAlert('錯誤：缺少 XLSX 函式庫。請確保您的頁面已載入 xlsx.full.min.js', 'error');
+					showCustomAlert('錯誤：缺少 XLSX 函式庫。請確保您的頁面已載入 xlsx.full.min.js', 'error'); // 🌟 替換 alert
 					return;
 				}
 
@@ -1010,6 +1063,7 @@
 				
 				const date = new Date().toISOString().slice(0, 10);
 				XLSX.writeFile(wb, `比對差異結果_${date}.xlsx`);
+                showCustomAlert('XLSX 檔案已開始下載！', 'success');
 			}
 
 		})();
