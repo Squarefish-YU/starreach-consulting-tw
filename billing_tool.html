@@ -16,7 +16,7 @@
         }
         .container {
             background-color: #fff;
-            padding: 30px;
+            padding: 10px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
@@ -43,7 +43,7 @@
             border-radius: 8px 8px 0 0;
             margin-right: 5px;
             position: relative;
-            top: 2px;
+            top: 0;
         }
         .tab-link.active {
             background-color: #4b4b4b;
@@ -227,6 +227,7 @@
             margin: 20px auto;
             width: 100%;
         }
+        /* 🌟 修改: 移除 float: right 和 margin-bottom */
         #copy-btn-compare {
             display: none; 
             background-color: #007bff;
@@ -236,12 +237,11 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 1em;
-            margin-bottom: 10px;
-            float: right;
         }
         #copy-btn-compare:hover {
             background-color: #0056b3;
         }
+		/* 🌟 修改: 移除 float: right 和 margin-bottom/margin-right */
 		#download-xlsx-btn-compare {
 			display: none; 
 			background-color: #28a745; 
@@ -251,13 +251,62 @@
 			border-radius: 5px;
 			cursor: pointer;
 			font-size: 1em;
-			margin-bottom: 10px;			
-			float: right; 			
-			margin-right: 10px; 
 		}
 		#download-xlsx-btn-compare:hover {
 			background-color: #1e7e34; /* 懸停時顏色變深 */
 		}
+		/* 🌟 新增/調整: 頂部控制列的 Flex 容器 */
+        #top-controls-row {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap; /* 允許換行以適應小螢幕 */
+        }
+
+        /* 🌟 新增/調整: 篩選區塊的樣式 (原內嵌樣式) */
+        #filter-controls-compare { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            border: 1px solid #ddd; 
+            padding: 10px; 
+            border-radius: 5px; 
+            flex-grow: 1; 
+            min-width: 300px; 
+            max-width: 50%; /* 佔用最多 70% 寬度，讓右側按鈕有空間 */
+            margin-right: 10px;
+        }
+        
+        /* 🌟 新增: 篩選區塊中 Label 的樣式 */
+        #filter-controls-compare label[for="hescode-filter"] {
+            white-space: nowrap; /* 防止標籤換行 */
+        }
+        
+        /* 🌟 新增: Hescode Select 框的樣式 */
+        #hescode-filter { 
+            padding: 5px; 
+            border-radius: 3px; 
+            font-size: 14px; 
+            flex-grow: 1; 
+            min-width: 100px;
+        }
+        
+        /* 🌟 新增: 篩選計數的樣式 */
+        #filtered-count {
+            font-weight: bold; 
+            color: #007bff; 
+            white-space: nowrap;
+        }
+
+        /* 🌟 新增/調整: 按鈕區塊的樣式 */
+        #action-buttons-compare {
+            display: flex; 
+            gap: 10px; 
+            flex-shrink: 0; 
+            margin-top: 5px;
+        }
+		
         #result-table-compare {
             width: 100%;
             border-collapse: collapse;
@@ -311,6 +360,44 @@
 			cursor: pointer;
 			margin: 5px;
 		}
+        /* 🌟 新增: 自訂訊息提示框 (Custom Alert) 樣式 */
+        #custom-alert {
+            visibility: hidden; /* 預設隱藏 */
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #333;
+            text-align: center;
+            border-radius: 6px;
+            padding: 16px;
+			font-weight: bold;
+            position: fixed;
+            z-index: 9999; /* 確保在最上層 */
+            right: 20px;
+            top: 50px;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: visibility 0s, opacity 0.5s linear;
+        }
+
+        #custom-alert.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* 成功訊息的樣式 */
+        #custom-alert.success {
+            background-color: #beedc0; /* 綠色 */
+			border: 2px solid #fff;
+			color: #08730c;
+        }
+
+        /* 錯誤訊息的樣式 */
+        #custom-alert.error {
+            background-color: #f5beba; /* 綠色 */
+			border: 2px solid #fff;
+			color: #910b01;
+        }
 		
     </style>
 
@@ -343,11 +430,24 @@
                 <div id="status-compare" class="status">正在等待檔案拖曳...</div> 
 
                 <h3>比較結果 (CSV 中存在，但 ZIP 中找不到 Meter ID)</h3>
+				
+                <div id="top-controls-row"> 
+                    
+                    <div id="filter-controls-compare">
+                        <label for="hescode-filter">依 Hescode 篩選:</label>
+                        <select id="hescode-filter">
+                            <option value="all">所有 Hescode</option>
+                        </select>
+                        <span id="filtered-count"></span>
+                    </div>
+
+                    <div id="action-buttons-compare">
+                        <button id="copy-btn-compare">一鍵複製</button>
+                        <button id="download-xlsx-btn-compare">下載 XLSX (ALL)</button>
+                    </div>
+
+                </div>
                 <div id="results-container-compare">
-                    <button id="copy-btn-compare">一鍵複製</button>
-					
-                    <button id="download-xlsx-btn-compare">下載 XLSX</button>
-					
                     <table id="result-table-compare">
                         <thead>
                             <tr>
@@ -428,9 +528,42 @@
             </div>
         </div>
     </div>
+	
+	<div id="custom-alert"></div>
 
     <script>
+        // =========================================================================
+        // --- 🌟 全域: 自訂訊息提示框 (Custom Alert) 函數 ---
+        // =========================================================================
+        let alertTimeout;
+
+        /**
+         * 顯示自訂訊息提示框 (Toast/Snackbar)
+         * @param {string} message - 要顯示的訊息內容。
+         * @param {'success' | 'error' | 'info'} type - 訊息類型，影響背景顏色。
+         */
+        function showCustomAlert(message, type = 'info') {
+            const alertBox = document.getElementById('custom-alert');
+            
+            // 清除現有的計時器，避免多個訊息同時出現
+            clearTimeout(alertTimeout);
+            
+            // 設置內容和樣式
+            alertBox.textContent = message;
+            alertBox.className = ''; // 清除所有舊類別
+            alertBox.classList.add(type);
+            alertBox.classList.add('show');
+            
+            // 設置自動隱藏
+            alertTimeout = setTimeout(() => {
+                alertBox.classList.remove('show');
+            }, 3000); // 3 秒後隱藏
+        }
+
+
+        // =========================================================================
         // --- 頁籤切換總控制 ---
+        // =========================================================================
         function setupTabs(tabLinksSelector, tabContentSelector) {
             const tabs = document.querySelectorAll(tabLinksSelector);
             const contents = document.querySelectorAll(tabContentSelector);
@@ -462,10 +595,13 @@
 			
 			// *** 新增：XLSX 下載按鈕 DOM 元素 ***
 			const downloadXlsxBtn = document.getElementById('download-xlsx-btn-compare'); 
-			
+            
+            // 🌟 新增：篩選相關 DOM 元素
+            const hescodeFilter = document.getElementById('hescode-filter'); 
+            const filteredCountSpan = document.getElementById('filtered-count');
+
 			// 初始狀態顯示
 			status.style.display = 'block';
-			// 🌟 調整 colspan 數量以配合新欄位
 			resultBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">結果將顯示於此</td></tr>';
 			copyBtn.style.display = 'none';
 			
@@ -473,6 +609,11 @@
 			if (downloadXlsxBtn) {
 				downloadXlsxBtn.style.display = 'none';
 			}
+            
+            // 🌟 清空篩選器
+            if (hescodeFilter) {
+                hescodeFilter.innerHTML = '<option value="all">所有 Hescode</option>';
+            }
 
 			// *** 新增欄位別名定義 ***
 			const FIELD_MAPPING = {
@@ -485,7 +626,10 @@
 			// ************************
 			
 			// 儲存比對結果，供下載使用
-			let currentMissingEntries = [];
+			// 🌟 儲存**所有**未篩選的結果
+			let allMissingEntries = []; 
+            // 🌟 儲存**目前**篩選後的結果
+            let currentFilteredEntries = [];
 
 			// --- 1. 設定拖曳事件監聽 (不變) ---
 			dropZone.addEventListener('dragover', (e) => {
@@ -501,6 +645,16 @@
 				dropZone.classList.remove('dragover');
 				handleFiles(e.dataTransfer.files);
 			});
+            
+            // --- 6.3 🌟 新增：篩選器變更事件監聽 ---
+            if (hescodeFilter) {
+                hescodeFilter.addEventListener('change', (e) => {
+                    // 只有在有資料時才進行篩選
+                    if (allMissingEntries.length > 0) {
+                        filterAndDisplayResults(allMissingEntries, e.target.value);
+                    }
+                });
+            }
 
 			// --- 2. 處理拖放的檔案 (不變) ---
 			async function handleFiles(files) {
@@ -531,10 +685,12 @@
 				// 執行前重置
 				status.textContent = '正在準備處理...';
 				status.style.color = 'blue';
-				// 🌟 調整 colspan 數量以配合新欄位
 				resultBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">正在處理中...</td></tr>';
 				copyBtn.style.display = 'none';
 				if (downloadXlsxBtn) downloadXlsxBtn.style.display = 'none'; // 重置 XLSX 按鈕
+                if (hescodeFilter) hescodeFilter.innerHTML = '<option value="all">所有 Hescode</option>';
+                if (filteredCountSpan) filteredCountSpan.textContent = '';
+
 
 				try {
 					status.textContent = '步驟 1/4: 正在讀取 CSV/TSV 檔案...';
@@ -558,12 +714,11 @@
 					console.error('處理檔案時發生錯誤:', error);
 					status.textContent = `錯誤: ${error.message} (請檢查檔案格式、欄位名稱或是否已下載 jszip.min.js 和 papaparse.min.js)`;
 					status.style.color = 'red';
-					// 🌟 調整 colspan 數量以配合新欄位
 					resultBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">${error.message}</td></tr>`;
 				}
 			}
 
-			// --- 3. 解析 CSV 檔案 (新增 demand 欄位擷取) ---
+			// --- 3. 解析 CSV 檔案 (新增 demand 欄位擷取) (保持不變) ---
 			function parseCSV(file, mapping) {
 				return new Promise((resolve, reject) => {
 					Papa.parse(file, {
@@ -593,7 +748,6 @@
 								}
 								if (!mappedFields.cust_id) { mappedFields.cust_id = null; }
 								if (!mappedFields.hescode) { mappedFields.hescode = null; }
-                                // 🌟 新增: 檢查 demand 欄位
                                 if (!mappedFields.demand) { mappedFields.demand = null; }
 
 
@@ -607,7 +761,6 @@
 											cust_id: mappedFields.cust_id ? (row[mappedFields.cust_id] ? String(row[mappedFields.cust_id]).trim() : '') : '',
 											meter_id: meterId,
 											hescode: mappedFields.hescode ? (row[mappedFields.hescode] ? String(row[mappedFields.hescode]).trim() : '') : '',
-                                            // 🌟 新增: demand 欄位擷取
                                             demand: mappedFields.demand ? (row[mappedFields.demand] ? String(row[mappedFields.demand]).trim().toUpperCase() : '') : ''
 										};
 									})
@@ -627,7 +780,7 @@
 				});
 			}
 
-			// --- 4. 解析 ZIP 檔案 (不變) ---
+			// --- 4. 解析 ZIP 檔案 (保持不變) ---
 			async function parseZIP(file) {
 				const zip = await JSZip.loadAsync(file);
 				const namesSet = new Set();
@@ -665,7 +818,7 @@
 				return namesSet;
 			}
 
-			// --- 5. 比較資料 (不變) ---
+			// --- 5. 比較資料 (保持不變) ---
 			function compareData(csvData, zipNamesSet) {
 				const missing = csvData.filter(csvRow => {
 					return csvRow && csvRow.meter_id && !zipNamesSet.has(csvRow.meter_id);
@@ -673,7 +826,7 @@
 				return missing;
 			}
 			
-			// --- 5.5. 新增：多重條件排序 ---
+			// --- 5.5. 多重條件排序 (保持不變) ---
 			function sortMissingEntries(entries) {
 				return entries.sort((a, b) => {
 					// 1. 主要排序鍵: hescode
@@ -683,11 +836,10 @@
 					if (hescodeA > hescodeB) return 1;
 
 					// 2. 次要排序鍵: demand (需量T/F)
-					// 假設 T > F，或按字串排序 (F 會排在 T 前面，如果您希望 T 在前，則需要額外判斷)
 					const demandA = a.demand || '';
 					const demandB = b.demand || '';
 					
-					// 為了確保一致的 T/F 排序邏輯（T在前，F在後），我們假設 T=True, F=False
+					// 為了確保一致的 T/F 排序邏輯（T在前，F在後）
 					if (demandA.toUpperCase() === 'T' && demandB.toUpperCase() === 'F') return -1;
 					if (demandA.toUpperCase() === 'F' && demandB.toUpperCase() === 'T') return 1;
 					if (demandA.toUpperCase() < demandB.toUpperCase()) return -1;
@@ -704,59 +856,117 @@
 			}
 
 
-			// --- 6. 顯示結果 (更新表格、複製、XLSX 邏輯以包含 demand 欄位) ---
+			// --- 6. 顯示結果 (更新以處理篩選邏輯) ---
 			function displayResults(missingEntries) {
-				resultBody.innerHTML = ''; 
-				currentMissingEntries = missingEntries; // 儲存結果
-
-				// 處理全部符合的情況
+                
+                // 處理全部符合的情況
 				if (missingEntries.length === 0) {
 					status.textContent = '比對完成：全部符合！ CSV 中的所有 Meter ID 均可在 ZIP 檔案中找到。';
 					status.style.color = 'green';
-					// 🌟 調整 colspan 數量以配合新欄位
 					resultBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">無差異資料 (全部符合)</td></tr>';
 					copyBtn.style.display = 'none';
-					if (downloadXlsxBtn) downloadXlsxBtn.style.display = 'none'; // 隱藏 XLSX 按鈕
-					alert('比對完成：全部符合！'); 
+					if (downloadXlsxBtn) downloadXlsxBtn.style.display = 'none'; 
+                    // 🌟 清空篩選器
+                    if (hescodeFilter) hescodeFilter.innerHTML = '<option value="all">所有 Hescode</option>';
+					if (filteredCountSpan) filteredCountSpan.textContent = '';
+					showCustomAlert('比對完成：全部符合！', 'success');
 					return;
 				}
-
-				// 處理有差異的情況
-				status.textContent = `比對完成：在 CSV 中找到 ${missingEntries.length} 筆資料不存在於 ZIP 檔案中。`;
+                
+                // 儲存**所有**結果 (已排序)
+                allMissingEntries = missingEntries; 
+                
+                // 1. 更新狀態
+				status.textContent = `比對完成：在 CSV 中找到 ${allMissingEntries.length} 筆資料不存在於 ZIP 檔案中。`;
 				status.style.color = 'darkorange';
 
-				// --- 設定複製按鈕 ---
-                // 🌟 更新複製內容以包含新欄位
-				let copyString = "Cust ID\tMeter ID\tHES Code\t需量(T/F)\n";
-				missingEntries.forEach(entry => {
-					copyString += `${entry.cust_id}\t${entry.meter_id}\t${entry.hescode}\t${entry.demand}\n`;
-				});
+                // 2. 🌟 填充篩選器並應用初始篩選（全部）
+                populateHescodeFilter(allMissingEntries);
+                filterAndDisplayResults(allMissingEntries, hescodeFilter.value); // 預設篩選所有
 
-				copyBtn.style.display = 'block'; 
-				copyBtn.onclick = () => {
-					// 🌟 更新 alert 訊息
-					navigator.clipboard.writeText(copyString).then(() => {
-						alert(`已複製 ${missingEntries.length} 筆資料到剪貼簿 (包含所有欄位: Cust ID, Meter ID, HES Code, 需量(T/F))`);
-					}, (err) => {
-						alert('複製失敗! 請檢查瀏覽器權限。 ' + err);
-					});
-				};
-				
-				// --- 🌟 新增：設定 XLSX 下載按鈕 ---
+				// 3. 🌟 設定 XLSX 下載按鈕 (維持下載全部)
 				if (downloadXlsxBtn) {
 					downloadXlsxBtn.style.display = 'block';
 					downloadXlsxBtn.onclick = () => {
-						downloadXLSX(currentMissingEntries);
+						downloadXLSX(allMissingEntries); // 下載 **所有** 差異資料
 					};
 				}
+			}
+            
+            // --- 6.1 🌟 新增：填充 Hescode 篩選器 ---
+            function populateHescodeFilter(entries) {
+                const uniqueHescodes = new Set();
+                entries.forEach(entry => {
+                    // 確保只加入有效的 hescode
+                    if (entry.hescode && String(entry.hescode).trim() !== '') {
+                        uniqueHescodes.add(entry.hescode);
+                    }
+                });
+                
+                const sortedHescodes = Array.from(uniqueHescodes).sort();
+                
+                let optionsHtml = '<option value="all">所有 Hescode</option>';
+                sortedHescodes.forEach(code => {
+                    optionsHtml += `<option value="${code}">${code}</option>`;
+                });
+                
+                hescodeFilter.innerHTML = optionsHtml;
+                hescodeFilter.value = 'all'; // 重設為 '所有'
+            }
 
-				// --- 效能修復：只渲染前 1000 筆資料 (不變) ---
-				const RENDER_LIMIT = 1000;
-				const entriesToRender = missingEntries.slice(0, RENDER_LIMIT);
+            // --- 6.2 🌟 新增：篩選並顯示結果到表格 (同時更新複製按鈕邏輯) ---
+            function filterAndDisplayResults(allEntries, selectedHescode) {
+                let entriesToDisplay = allEntries;
+                
+                if (selectedHescode && selectedHescode !== 'all') {
+                    entriesToDisplay = allEntries.filter(entry => entry.hescode === selectedHescode);
+                }
+                
+                // 🌟 儲存篩選後的結果供複製功能使用
+                currentFilteredEntries = entriesToDisplay; 
+                
+                // 更新計數顯示
+                if (filteredCountSpan) filteredCountSpan.textContent = `(共 ${currentFilteredEntries.length} 筆)`;
+                
+                // --- 🌟 設定複製按鈕 (僅複製篩選後的電號+表號) ---
+                let copyString = "";
+                currentFilteredEntries.forEach(entry => {
+                    copyString += `${entry.cust_id}\t${entry.meter_id}\n`;
+                });
+                
+                copyBtn.style.display = 'block'; 
+                copyBtn.onclick = () => {
+                    // 🌟 僅複製 電號 (cust_id) 和 表號 (meter_id)
+                    if (currentFilteredEntries.length === 0) {
+                        showCustomAlert('目前篩選結果為空，無法複製。', 'error');
+                        return;
+                    }
+                    navigator.clipboard.writeText(copyString).then(() => {
+                        showCustomAlert(`已複製 ${currentFilteredEntries.length} 筆資料到剪貼簿 (僅電號/表號)`, 'success');
+                    }, (err) => {
+                        showCustomAlert('複製失敗! 請檢查瀏覽器權限。', 'error');
+                    });
+                };
+                
+                // --- 渲染表格 ---
+                resultBody.innerHTML = ''; 
+                
+                if (entriesToDisplay.length === 0) {
+                    resultBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">無符合篩選條件的資料</td></tr>';
+                    return;
+                }
+                
+                // ... (渲染邏輯保持不變) ...
+                const RENDER_LIMIT = 1000;
+				const entriesToRender = entriesToDisplay.slice(0, RENDER_LIMIT);
 				
-				if (missingEntries.length > RENDER_LIMIT) {
-					status.textContent += ` (為防止瀏覽器當機，頁面僅顯示前 ${RENDER_LIMIT} 筆，但 "一鍵複製" 和 "下載 XLSX" 功能會包含全部 ${missingEntries.length} 筆)`;
+				// 確保狀態列正確顯示總數
+				let currentStatusText = status.textContent.split(' (為防止')[0];
+				if (entriesToDisplay.length > RENDER_LIMIT) {
+					currentStatusText += ` (為防止瀏覽器當機，頁面僅顯示前 ${RENDER_LIMIT} 筆，但 "一鍵複製" 和 "下載 XLSX" 功能會包含所有 ${entriesToDisplay.length} 筆)`;
 				}
+				status.textContent = currentStatusText;
+
 
 				// 渲染資料
 				entriesToRender.forEach(entry => {
@@ -774,37 +984,30 @@
 					tdHescode.textContent = entry.hescode;
 					tr.appendChild(tdHescode);
 					
-                    // 🌟 渲染新的 demand 欄位
                     const tdDemand = document.createElement('td');
 					tdDemand.textContent = entry.demand;
 					tr.appendChild(tdDemand);
 					
 					resultBody.appendChild(tr);
 				});
-			}
+            }
 			
-			// --- 7. 🌟 新增：XLSX 下載功能函式 (更新以包含 demand 欄位) ---
+			// --- 7. 下載 XLSX (維持下載全部) ---
 			function downloadXLSX(data) {
 				if (typeof XLSX === 'undefined') {
-					alert('錯誤：缺少 XLSX 函式庫。請確保您的頁面已載入 xlsx.full.min.js');
+					showCustomAlert('錯誤：缺少 XLSX 函式庫。請確保您的頁面已載入 xlsx.full.min.js', 'error');
 					return;
 				}
 
-                // 🌟 更新標頭
+                // 🌟 使用傳入的 data (allMissingEntries)
 				const header = ['Cust ID', 'Meter ID', 'HES Code', '需量(T/F)'];
 				
-				// 將物件陣列轉換為陣列陣列 (包含標頭)
-                // 🌟 更新資料對應
 				const exportData = [header, ...data.map(item => [item.cust_id, item.meter_id, item.hescode, item.demand])];
 				
-				// 建立工作表
 				const ws = XLSX.utils.aoa_to_sheet(exportData);
-				
-				// 建立工作簿
 				const wb = XLSX.utils.book_new();
 				XLSX.utils.book_append_sheet(wb, ws, "比對結果");
 				
-				// 下載檔案
 				const date = new Date().toISOString().slice(0, 10);
 				XLSX.writeFile(wb, `比對差異結果_${date}.xlsx`);
 			}
@@ -1107,14 +1310,14 @@
 			startBtn.addEventListener('click', async () => {
 				const files = fileInput.files;
 				if (!files || files.length === 0) {
-					alert('請先選擇要處理的 Excel 檔案！');
+					showCustomAlert('請先選擇要處理的 Excel 檔案！', 'error');
 					return;
 				}
 				
 				const isSpecifyDate = document.getElementById('date-specify-merge-split').checked;
 				const specifiedDate = specifiedDateInput.value;
 				if (isSpecifyDate && !specifiedDate) {
-					alert('若選擇「指定日期」，請務必填寫日期！');
+					showCustomAlert('若選擇「指定日期」，請務必填寫日期！', 'error');
 					return;
 				}
 
@@ -1292,3 +1495,4 @@
     </script>
 </body>
 </html>
+
