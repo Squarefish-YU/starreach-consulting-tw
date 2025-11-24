@@ -278,10 +278,11 @@
         <div class="info">
             <strong>💡 使用說明：</strong><br>
             • 自動偵測語言並翻譯（中文↔英文）<br>
+            • 支援長文本自動分段翻譯（無字數限制）<br>
             • 使用 LibreTranslate + MyMemory 雙重備援<br>
             • 點擊 ⇄ 按鈕切換翻譯方向<br>
             • 支援即時輸入即時翻譯（延遲 500ms）<br>
-            • 完全免費，無需 API 金鑰
+            • 長文本會顯示翻譯進度
         </div>
     </div>
 
@@ -307,7 +308,87 @@
             return chineseChars > totalChars * 0.3 ? 'zh' : 'en';
         }
 
-        // 翻譯函數 - 使用多個備用 API
+        // 分段函數 - 將長文本分成多個段落
+        function splitText(text, maxLength = 500) {
+            if (text.length <= maxLength) return [text];
+            
+            const chunks = [];
+            const sentences = text.split(/([。！？\.!?\n]+)/);
+            let currentChunk = '';
+            
+            for (let i = 0; i < sentences.length; i++) {
+                const sentence = sentences[i];
+                
+                if ((currentChunk + sentence).length <= maxLength) {
+                    currentChunk += sentence;
+                } else {
+                    if (currentChunk) chunks.push(currentChunk);
+                    currentChunk = sentence;
+                }
+            }
+            
+            if (currentChunk) chunks.push(currentChunk);
+            
+            // 如果還是太長，強制按字元數分割
+            const finalChunks = [];
+            for (const chunk of chunks) {
+                if (chunk.length <= maxLength) {
+                    finalChunks.push(chunk);
+                } else {
+                    for (let i = 0; i < chunk.length; i += maxLength) {
+                        finalChunks.push(chunk.substring(i, i + maxLength));
+                    }
+                }
+            }
+            
+            return finalChunks;
+        }
+
+        // 翻譯單個段落
+        async function translateChunk(text, fromLang, toLang) {
+            // 嘗試第一個 API: LibreTranslate
+            try {
+                const response = await fetch('https://libretranslate.de/translate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        q: text,
+                        source: fromLang === 'zh-TW' ? 'zh' : fromLang,
+                        target: toLang === 'zh-TW' ? 'zh' : toLang,
+                        format: 'text'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.translatedText;
+                }
+            } catch (e) {
+                console.log('LibreTranslate failed, trying backup...');
+            }
+
+            // 備用 API: MyMemory
+            try {
+                const response = await fetch(
+                    `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromLang}|${toLang}`
+                );
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.responseStatus === 200) {
+                        return data.responseData.translatedText;
+                    }
+                }
+            } catch (e) {
+                console.log('MyMemory failed');
+            }
+
+            throw new Error('Translation failed');
+        }
+
+        // 翻譯函數 - 支援長文本分段翻譯
         async function translate(text, fromLang, toLang) {
             if (!text.trim()) {
                 targetText.value = '';
@@ -316,53 +397,35 @@
 
             try {
                 targetText.classList.add('loading');
+                targetText.value = '正在翻譯...';
                 
-                // 嘗試第一個 API: LibreTranslate
-                try {
-                    const response = await fetch('https://libretranslate.de/translate', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            q: text,
-                            source: fromLang === 'zh-TW' ? 'zh' : fromLang,
-                            target: toLang === 'zh-TW' ? 'zh' : toLang,
-                            format: 'text'
-                        })
-                    });
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        targetText.value = data.translatedText;
-                        return;
-                    }
-                } catch (e) {
-                    console.log('LibreTranslate failed, trying backup...');
-                }
-
-                // 備用 API: MyMemory
-                try {
-                    const response = await fetch(
-                        `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromLang}|${toLang}`
-                    );
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.responseStatus === 200) {
-                            targetText.value = data.responseData.translatedText;
-                            return;
+                // 分割文本
+                const chunks = splitText(text, 500);
+                const translatedChunks = [];
+                
+                // 逐段翻譯
+                for (let i = 0; i < chunks.length; i++) {
+                    try {
+                        const translated = await translateChunk(chunks[i], fromLang, toLang);
+                        translatedChunks.push(translated);
+                        
+                        // 即時更新進度
+                        targetText.value = `正在翻譯... (${i + 1}/${chunks.length})\n\n${translatedChunks.join('')}`;
+                        
+                        // 避免 API 限流，每次翻譯間隔 300ms
+                        if (i < chunks.length - 1) {
+                            await new Promise(resolve => setTimeout(resolve, 300));
                         }
+                    } catch (e) {
+                        console.error('Chunk translation failed:', e);
+                        translatedChunks.push(`[段落 ${i + 1} 翻譯失敗]`);
                     }
-                } catch (e) {
-                    console.log('MyMemory failed');
                 }
-
-                // 如果都失敗，顯示錯誤訊息
-                targetText.value = '⚠️ 翻譯服務暫時無法使用\n請檢查網路連線或稍後再試';
+                
+                targetText.value = translatedChunks.join('');
                 
             } catch (error) {
-                targetText.value = '⚠️ 網路錯誤\n請檢查連線狀態';
+                targetText.value = '⚠️ 翻譯失敗\n請檢查網路連線或稍後再試';
                 console.error('Translation error:', error);
             } finally {
                 targetText.classList.remove('loading');
